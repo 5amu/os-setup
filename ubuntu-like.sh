@@ -18,6 +18,7 @@ err() { errmsg "$1"; return 1; }
 
 # Everybody like faster updates
 rankMirrors() {
+  sudo apt -y update && sudo apt -y install curl || err "Unable to install curl, mirrors not updated"
   url=$( curl -s http://mirrors.ubuntu.com/mirrors.txt | xargs -n1 -I {} sh -c 'echo $(curl -r 0-102400 -s -w %{speed_download} -o /dev/null {}/ls-lR.gz) {}' | sort -gr | head -1 | cut -d" " -f2 )
   codename=$( lsb_release -cs )
   printf "Backing up source list to /etc/apt/sources.list.bak\\nNew source list:"
@@ -86,18 +87,16 @@ removeUseless() {
   sudo apt -y autoremove && sudo apt -y autoclean
 }
 
-
-# Update mirrors before anything else
-sudo apt -y update && sudo apt -y install curl
-rankMirrors && sudo apt -y update
-
 # Install dialog to choose some stuff
-sudo apt -y install dialog || { errmsg "Cannot go on without dialog"; exit 1; }
+command -v dialog || { errmsg "Cannot go on without dialog"; exit 1; }
 
 # Welcome screen
 dialog --backtitle "os-setup" --title "Welcome!" --msgbox "Welcome to this wizard-ish installer.\\nThis script will guide you, so just relax and let me guide you.\\n\\n\\nValerio Casalino" 10 60
 
-# Terminal emulator choice
-teChoice=$(dialog --clear --backtitle "os-setup" --title "Terminal Emulator" --menu "Choose one of the following:" 15 40 4 xterm "Minimal terminal for the X system, with custom settings" alacritty "Blazing fast terminal emulator written in Rust" xfce4-terminal "Default for the xfce desktop environment" 3>&1 1>&2 2>&3 3>&1 )
+# Prompt to update mirrors
+dialog --backtitle "os-setup" --title "Mirrors update" --yesno "Do you wish to automatically update your mirrors?" 15 40 4 && clear && rankMirrors && sudo apt -y update && printf "\\n\\nMirrors Updated!\n" && sleep 2
 
+# Choices
+termEmulaor=$(dialog --clear --backtitle "os-setup" --title "Terminal Emulator" --menu "Choose one of the following:" 15 40 4 xterm "Minimal terminal for the X system, with custom settings" alacritty "Blazing fast terminal emulator written in Rust" xfce4-terminal "Default for the xfce desktop environment" 3>&1 1>&2 2>&3 3>&1 )
+webBrowser=$(dialog --clear --backtitle "os-setup" --title "Web Browser" --menu "Choose one of the following:")
 
