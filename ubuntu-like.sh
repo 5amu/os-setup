@@ -51,10 +51,15 @@ setupZsh() {
 }
 
 # Use alacritty.yml in the repository
-setupTerminalEmulator() {
+setupTerminalEmulatorAlacritty() {
   sudo apt -y install alacritty || err "Unable to install alacritty"
   mkdir -p "$HOME/.config/alacritty"
   # wget "https://raw.githubusercontent...." -O "$HOME/.config/alacritty/alacritty.yml" || war "Config for alacritty not downloaed properly"
+}
+
+setupTerminalEmulatorXterm() {
+  sudo apt -y install xterm || err "Unable to install xterm"
+  cp ./resources/.Xresources "$HOME" && printf "Restart (or logout) required"
 }
 
 installVScode() {
