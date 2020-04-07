@@ -50,6 +50,7 @@ installZsh() {
 
 # Use alacritty.yml in the repository
 installAlacritty() {
+  sudo add-apt-repository "ppa:mmstick76/alacritty"
   sudo apt -y install alacritty || err "Unable to install alacritty"
   mkdir -p "$HOME/.config/alacritty"
   cp ./resources/alacritty.yml "$HOME/.config/alacritty"
