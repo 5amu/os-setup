@@ -96,11 +96,25 @@ dialog --backtitle "os-setup" --title "Welcome!" --msgbox "Welcome to this wizar
 # Prompt to update mirrors
 dialog --backtitle "os-setup" --title "Mirrors update" --yesno "Do you wish to automatically update your mirrors?" 15 70 && clear && setMirrors && sudo apt -y update && printf "\\n\\nMirrors Updated!\n" && sleep 2
 
+# Messages
+CURRENT="Keep the current configuration"
+DE_XFCE="For now I support just this"
+DE_GNM3="Don't pick this (yet)"
+DE_I3WM="Don't pick this (yet)"
+TE_XTERM="Minimal terminal for the X system, with custom settings"
+TE_ALACRITY="Blazing fast terminal emulator written in Rust"
+BR_BRAVE="Chromium-based, privacy focused browser"
+BR_FIREFOX="It's a classic, preinstalled"
+BR_CHROMIUM="The open source browser de-facto standard"
+SW_ZSHFONTS="Install zsh and NerdFonts"
+SW_VSCODE="Install Visual Studio Code (oss if possible)"
+SW_VIRTUALBOX="Install VM manager Virtualbox by Oracle"
+
 # Choices
-desktopEnv=$(dialog --clear --backtitle "os-setup" --title "Desktop Environment" --menu "Choose one of the following:" 15 70 4 current "Do not install any" xfce4 "For now I support just this" gnome3 "Don't pick this (yet)" i3 "Don't pick this (yet)" 3>&1 1>&2 2>&3 3>&1)
-termEmulat=$(dialog --clear --backtitle "os-setup" --title "Terminal Emulator" --menu "Choose one of the following:" 15 70 4 current "Do not install" xterm "Minimal terminal for the X system, with custom settings" alacritty "Blazing fast terminal emulator written in Rust" xfce4-terminal "Default for the xfce desktop environment" 3>&1 1>&2 2>&3 3>&1 )
-webBrowser=$(dialog --clear --backtitle "os-setup" --title "Web Browser" --menu "Choose one of the following:" 15 70 4 brave "Chromium-based, privacy focused browser" firefox "It's a classic, preinstalled" chromium "The open source browser de-facto standard" 3>&1 1>&2 2>&3 3>&1)
-programLst=$(dialog --clear --backtitle "os-setup" --title "Software" --checklist "Press space to mark a program for installation" 15 70 4 zsh+fonts "Install zsh and NerdFonts" vscode "Install Visual Studio Code (oss if possible)"   )
+desktopEnv=$(dialog --clear --backtitle "os-setup" --title "Desktop Environment" --menu "Choose one of the following:" 15 70 4 current "$CURRENT" xfce4 "$DE_XFCE" gnome3 "$DE_GNM" i3 "$DE_I3WM" 3>&1 1>&2 2>&3 3>&1)
+termEmulat=$(dialog --clear --backtitle "os-setup" --title "Terminal Emulator" --menu "Choose one of the following:" 15 70 4 current "$CURRENT" xterm "$TE_XTERM" alacritty "$TE_ALACRITY" 3>&1 1>&2 2>&3 3>&1 )
+webBrowser=$(dialog --clear --backtitle "os-setup" --title "Web Browser" --menu "Choose one of the following:" 15 70 4 current "$CURRENT" brave "$BR_BRAVE" firefox "$BR_FIREFOX" chromium "$BR_CHROMIUM" 3>&1 1>&2 2>&3 3>&1)
+programLst=$(dialog --clear --backtitle "os-setup" --title "Software" --checklist "Press space to mark a program for installation" 15 70 4 zsh+fonts "$SW_ZSHFONTS" vscode "$SW_VSCODE" virtualbox "$SW_VIRTUALBOX"  )
 
 # Actual changes (draft)
 dialog --clear --backtitle "os-setup" --infobox "Setting up desktop environment" 15 70 && sleep 2
