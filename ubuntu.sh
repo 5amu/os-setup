@@ -28,10 +28,10 @@ installpkg() { for i in $@; do command -v "$i" > /dev/null | apt -y install "$i"
 
 # Apt mirror:// method to get apt choose the best mirror
 setMirrors() {
-  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s main restricted universe multiverse" "$UBUNTU_CODENAME" | tee /etc/apt/sources.list
-  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-updates main restricted universe multiverse" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
-  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-backports main restricted universe multiverse" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
-  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-security main restricted universe multiverse" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
+  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s main restricted universe multiverse\\n" "$UBUNTU_CODENAME" | tee /etc/apt/sources.list
+  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-updates main restricted universe multiverse\\n" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
+  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-backports main restricted universe multiverse\\n" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
+  printf "deb mirror://mirrors.ubuntu.com/mirrors.txt %s-security main restricted universe multiverse\\n" "$UBUNTU_CODENAME" | tee -a /etc/apt/sources.list
 }
 
 # Install nerd fonts... It will require a while
