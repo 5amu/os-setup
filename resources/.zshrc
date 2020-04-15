@@ -1,7 +1,5 @@
 export TERM="xterm-256color"
 
-POWERLEVEL9K_MODE=nerdfont-complete
-
 setopt menu_complete inc_append_history autocd recexact longlistjobs histignorealldups autopushd nobgnice autoparamslash
 
 autoload -U history-search-end
@@ -17,7 +15,6 @@ SAVEHIST=1000
 # Custom bin paths
 [ -d "$HOME/scripts" ] && PATH="$HOME/scripts:$PATH"
 [ -d "/opt/bin" ] && PATH="/opt/bin:$PATH"
-[ -d "$HOME/.gem/ruby/2.7.0/bin" ] && PATH="$HOME/.gem/ruby/2.7.0/bin/:$PATH"
 PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
 
 # Custom locations
@@ -114,48 +111,8 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 
 ### Source plugins
 ##################
-source "/usr/share/powerlevel9k/powerlevel9k.zsh-theme"
 source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-### Plugins variables
-#####################
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#a3a3c2"
-
-### Powerlevel9k
-#
-# Color reference: https://user-images.githubusercontent.com/704406/43988708-64c0fa52-9d4c-11e8-8cf9-c4d4b97a5200.png
-#
-################
-POWERLEVEL9K_COLOR_SCHEME='dark'
-
-# dir
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
-POWERLEVEL9K=truncate_beginning
-POWERLEVEL9K_FOLDER_ICON=
-
-# vcs
-#POWERLEVEL9K_VCS_CLEAN_FOREGROUND=black
-#POWERLEVEL9K_VCS_CLEAN_BACKGROUND=green
-#POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=black
-#POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=yellow
-#POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=black
-#POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=yellow
-#POWERLEVEL9K_VCS_UNTRACKED_ICON=●
-#POWERLEVEL9K_VCS_UNSTAGED_ICON=±
-#POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON=↓
-#POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON=↑
-#POWERLEVEL9K_VCS_COMMIT_ICON=' '
-
-# status
-POWERLEVEL9K_STATUS_OK=false
-
-# custom os icon
-POWERLEVEL9K_CUSTOM_OS_ICON='echo   $(whoami) '
-POWERLEVEL9K_CUSTOM_OS_ICON_BACKGROUND='008'
-POWERLEVEL9K_CUSTOM_OS_ICON_FOREGROUND='220'
-
-# prompt elements
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_os_icon ssh root_indicator dir dir_writable)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(vcs ssh status time background_jobs)
-
+# Use starship ( https://starship.rs )
+eval "$(starship init zsh)"
