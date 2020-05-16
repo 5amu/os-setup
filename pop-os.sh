@@ -9,15 +9,6 @@
 errmsg() { printf "\e[31m%s\e[0m\\n" "$1"; }
 insmsg() { printf "\e[32m==>\e[0m %s\\n" "$1"; }
 
-### Checks
-##########
-# Check if root
-[ $EUID -ne 0 ] && errmsg "Please, run with sudo" && exit 1
-# Check if Pop!_OS
-[ "$( lsb_release -is )" != "Pop" ] && errmsg "Not on Pop!_OS" && exit 1
-# Check if running with sudo
-[ -z "$SUDO_USER" ] && errmsg "Run with sudo, not logged as superuser" && exit 1
-
 ### Global variables
 ####################
 UBUNTU_CODENAME=$( lsb_release -cs )
@@ -25,6 +16,12 @@ PKG_LIST="./resources/pop-os-packages.txt"
 
 ### Functions 
 #############
+check_settings() {
+  [ $EUID -ne 0 ] && errmsg "Please, run with sudo" && return 1
+  [ "$( lsb_release -is )" != "Pop" ] && errmsg "Not on Pop!_OS" && return 1
+  [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not logged as root" && return 1
+}
+
 apt_update() { 
   ( apt -y update && apt -y full-upgrade || return 1 ) 2>/dev/null 
 }
@@ -97,6 +94,7 @@ myhome_setup() {
 
 ### Actual script
 #################
+check_settings || exit 1
 # Greetings
 printf "Welcome to this installation!\\n"
 # Updates and install pkgs
