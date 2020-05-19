@@ -20,6 +20,7 @@ check_settings() {
   [ $USER != "root" ] && errmsg "Please, run with sudo" && return 1
   [ "$( lsb_release -is )" != "Pop" ] && errmsg "Not on Pop!_OS" && return 1
   [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not logged as root" && return 1
+  return 0
 }
 
 apt_update() { 
