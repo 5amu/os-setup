@@ -1,0 +1,11 @@
+cmake
+curl
+g++
+git
+gnupg
+imagemagick
+neovim
+pandoc
+tmux
+wkhtmltopdf
+zsh
