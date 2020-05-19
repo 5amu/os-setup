@@ -7,15 +7,13 @@ repository... 🧙‍♂️🔧
 Ubuntu WSL:
 
 ```bash
-sudo su
-curl -sSLf "https://github.com/casalinovalerio/os-setup/raw/master/wsl.sh" | sh
+curl -sSLf "https://github.com/casalinovalerio/os-setup/raw/master/wsl.sh" | sudo sh
 ```
 
 Pop!\_OS:
 
 ```bash
-sudo su
-curl -sSLf "https://github.com/casalinovalerio/os-setup/raw/master/pop-os.sh" | sh
+curl -sSLf "https://github.com/casalinovalerio/os-setup/raw/master/pop-os.sh" | sudo sh
 ```
 
 Windows 10:
