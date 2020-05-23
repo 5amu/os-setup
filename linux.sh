@@ -2,6 +2,9 @@
 ###############################################################################
 ### Author:       Valerio Casalino                                          ###
 ### Description:  Install basic software and workflow                       ###
+### TODO:         - Add AUR helper for arch                                 ###
+###               - Add installers for apckages not in repos                ###
+###               - Do more testing                                         ###
 ###############################################################################
 
 ### Output messages
@@ -12,9 +15,9 @@ insmsg() { printf "\e[32m==>\e[0m %s\\n" "$1"; }
 ### Global variables
 ####################
 _popos="https://git.io/Jfu1P"
-_ubuntu=""
-_wsl=""
-_arch=""
+_ubuntu="https://git.io/JfacQ"
+_wsl="https://git.io/Jfu1D"
+_arch="https://git.io/Jfac5"
 
 ### Functions 
 #############
