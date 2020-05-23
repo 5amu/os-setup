@@ -1,0 +1,12 @@
+apt-transport-https
+chromium-browser
+cmake
+curl
+docker.io
+g++
+gcc
+git
+make
+mpv
+neovim
+zsh
