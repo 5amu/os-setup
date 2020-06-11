@@ -1,0 +1,10 @@
+burpsuite
+chankro
+crackmapexec
+ffuf
+gobuster
+hashid
+joomlascan
+msfdb
+wfuzz
+wordlistctl

@@ -18,6 +18,7 @@ _popos="https://git.io/Jfu1P"
 _ubuntu="https://git.io/JfacQ"
 _wsl="https://git.io/Jfu1D"
 _arch="https://git.io/Jfac5"
+_blackarch="https://git.io/Jf9ij"
 
 ### Functions 
 #############
@@ -112,17 +113,33 @@ myhome_setup() {
   git_myhome submodule update
 }
 
+want_blackarch() {
+  printf "[n/Y]" && read -r _choice
+  [ "$_choice" != "y" ] && [ "$_choice" != "Y" ] && return 0
+  wget "https://blackarch.org/strap.sh" -O "/tmp/blackarch"
+}
+
+blackarch() {
+  [ ! -f "/tmp/blackarch" ] && return 0
+  chmod +x /tmp/blackarch
+  /tmp/blackarch \
+    && installer $( curl -sL "$_blackarch" | tr '\n' ' ' ) \
+    || { errmsg "Error in installation" && return 1; }
+}
+
 ### Actual script
 #################
 printf "Welcome to this installation!\\n" 
 
 # Preparation of the installer
 check_settings && find_distro && assign_pkglist || exit 1
+[ "$_pkgmanager" = "pacman" ] && insmsg "Install Blackarch?" && want_blackarch
 
 # Acual modifications
 insmsg "Updating [updater()]" && updater || exit 1
 insmsg "Installing [install_pkgs()]" && install_pkgs || exit 1
 insmsg "Setup home [myhome_setup()]" && myhome_setup
+[ "$_pkgmanager" = "pacman" ] && insmsg "Blackarch? Install pkgs" && blackarch
 insmsg "Cleaning [cleaner()]" && apt_clean
 
 printf "It is done!!"
