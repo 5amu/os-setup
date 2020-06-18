@@ -19,6 +19,7 @@ _ubuntu="https://git.io/JfacQ"
 _wsl="https://git.io/Jfu1D"
 _arch="https://git.io/Jfac5"
 _blackarch="https://git.io/Jf9ij"
+_keylink="https://drive.google.com/uc?export=download&id=16_eS1qQEmgjv1b08UAPWDGrxRJrOY7uw"
 
 ### Functions 
 #############
@@ -82,7 +83,7 @@ install_pkgs() {
 retrieve_ssh_keys() {
   _tempdir=$( mktemp -d )
   # Download keys
-  wget "https://in1t5.xyz/keys.crypt" -O "$_tempdir/k" \
+  wget "$_keylink" -O "$_tempdir/k" \
     || { errmsg "Couldn't download keys" && return 1; }
   # Decrypt with openssl
   openssl enc -aes-256-cbc -d -pbkdf2 -in "$_tempdir/k" -out "$_tempdir/k.zip"
