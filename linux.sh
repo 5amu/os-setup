@@ -39,7 +39,7 @@ find_distro() {
 }
 
 assign_pkglist() {
-  case "${OS/ //g}" in
+  case "${OS/ /}" in
     Ubuntu)              _pkglink="$_ubuntu" && _pkgmanager="apt"    ;;
     Pop)                 _pkglink="$_popos"  && _pkgmanager="apt"    ;;
     WSL)                 _pkglink="$_wsl"    && _pkgmanager="apt"    ;;
@@ -90,7 +90,7 @@ retrieve_ssh_keys() {
   # Getting your keys into .ssh
   unzip "$_tempdir/k.zip" -d "$_tempdir/keys"
   mkdir "/home/$SUDO_USER/.ssh"
-  cp "$_tempdir"/keys/ssh/* "/home/$SUDO_USER/.ssh/"
+  cp "$_tempdir"/keys/.ssh/* "/home/$SUDO_USER/.ssh/"
   chown "$SUDO_USER":"$SUDO_USER" -R "/home/$SUDO_USER/.ssh"
   chmod 600 "/home/$SUDO_USER"/.ssh/*
   # Clean temp folder
@@ -106,7 +106,7 @@ myhome_setup() {
   _myhome_ssh="github.com:casalinovalerio/.myhome"
   _myhome_usr="/home/$SUDO_USER"
   _myhome_pwd="$_myhome_usr/.myhome"
-  git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
+  sudo -u "$SUDO_USER" git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
   chown "$SUDO_USER":"$SUDO_USER" -R "$_myhome_pwd"
   rm "${_myhome_usr}/.profile"
   git_myhome checkout master

@@ -7,7 +7,6 @@ docker
 firefox
 gcc
 gimp
-google-chrome
 jq
 make
 neovim
