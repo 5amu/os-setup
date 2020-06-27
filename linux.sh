@@ -13,12 +13,18 @@ insmsg() { printf "\e[32m==>\e[0m %s\\n" "$1"; }
 
 ### Global variables
 ####################
-_popos="https://git.io/Jfu1P"
-_ubuntu="https://git.io/JfacQ"
-_wsl="https://git.io/Jfu1D"
-_arch="https://git.io/Jfac5"
-_blackarch="https://git.io/Jf9ij"
-_keylink="https://drive.google.com/uc?export=download&id=16_eS1qQEmgjv1b08UAPWDGrxRJrOY7uw"
+_popos="alacritty chromium chromium-ublock-origin code curl docker.io firefox \
+  gcc gnome-mpv gnome-tweak-tool spotify-client steam-installer virtualbox \
+  telegram-desktop wget zathura zathura-cb zathura-djvu zathura-ps zsh"
+_ubuntu="apt-transport-https chromium-browser cmake curl docker.io g++ gcc git \
+  make mpv neovim zsh"
+_wsl="cmake curl g++ git gnupg imagemagick neovim pandoc tmux wkhtmltopdf zsh"
+_arch="alacritty android-tools android-udev cmake docker firefox gcc gimp jq \
+  make neovim r sxiv tmux tor torsocks unzip virtualbox xclip zathura zip \
+  zathura-pdf-poppler"
+_blackarch="burpsuite chankro crackmapexec ffuf gobuster hashid joomlascan \
+  msfdb wfuzz wordlistctl"
+_keylink="https://strap.casalinovalerio.com/keys.crypt"
 
 ### Functions 
 #############
@@ -48,8 +54,8 @@ assign_pkglist() {
 }
   
 update() {
-[ "$_pkgmanager" = "apt" ] \
-&& ( apt -y update && apt -y full-upgrade || return 1 ) 2>/dev/null
+  [ "$_pkgmanager" = "apt" ] \
+    && ( apt -y update && apt -y full-upgrade || return 1 ) 2>/dev/null
   [ "$_pkgmanager" = "pacman" ] \
       && ( pacman --noconfirm -Syyu || return 1 ) 2>/dev/null
 }
@@ -69,30 +75,26 @@ cleaner() {
   clean || { errmsg "Couldn't clean" && return 1; }
 }
 
-installer() {
+install_pkgs() {
   [ "$_pkgmanager" = "apt" ] && apt -y install $@
   [ "$_pkgmanager" = "pacman" ] && pacman --noconfirm -S $@
 } 
 
-install_pkgs() {
-  installer $( curl -sL "$_pkglink" | tr '\n' ' ' ) \
+installer() {
+  install_pkgs "$_pkglink" \
     || { errmsg "Error in installation" && return 1; } 
 }
 
 retrieve_ssh_keys() {
   _tempdir=$( mktemp -d )
-  # Download keys
   wget "$_keylink" -O "$_tempdir/k" \
     || { errmsg "Couldn't download keys" && return 1; }
-  # Decrypt with openssl
   openssl enc -aes-256-cbc -d -pbkdf2 -in "$_tempdir/k" -out "$_tempdir/k.zip"
-  # Getting your keys into .ssh
   unzip "$_tempdir/k.zip" -d "$_tempdir/keys"
   mkdir "/home/$SUDO_USER/.ssh"
   cp "$_tempdir"/keys/.ssh/* "/home/$SUDO_USER/.ssh/"
   chown "$SUDO_USER":"$SUDO_USER" -R "/home/$SUDO_USER/.ssh"
   chmod 600 "/home/$SUDO_USER"/.ssh/*
-  # Clean temp folder
   rm -rf "$_tempdir"
 }
 
@@ -123,7 +125,7 @@ blackarch() {
   [ ! -f "/tmp/blackarch" ] && return 0
   chmod +x /tmp/blackarch
   /tmp/blackarch \
-    && installer $( curl -sL "$_blackarch" | tr '\n' ' ' ) \
+    && installer "$_blackarch" \
     || { errmsg "Error in installation" && return 1; }
 }
 
@@ -138,13 +140,10 @@ aur_helper() {
 #################
 printf "Welcome to this installation!\\n" 
 
-# Preparation of the installer
 check_settings && find_distro && assign_pkglist || exit 1
 [ "$_pkgmanager" = "pacman" ] && insmsg "Install Blackarch?" && want_blackarch
-
-# Acual modifications
 insmsg "Updating [updater()]" && updater || exit 1
-insmsg "Installing [install_pkgs()]" && install_pkgs || exit 1
+insmsg "Installing [installer()]" && installer || exit 1
 [ "$_pkgmanager" = "pacman" ] && aur_helper 
 insmsg "Setup home [myhome_setup()]" && myhome_setup
 [ "$_pkgmanager" = "pacman" ] && insmsg "Blackarch? Install pkgs" && blackarch
