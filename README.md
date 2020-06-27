@@ -14,11 +14,11 @@ repository... 🧙🔧
 Linux:
 
 ```bash
-curl -sSLf "https://github.com/casalinovalerio/os-setup/raw/master/linux.sh" | sudo sh
+curl -sSLf "https://strap.casalinovalerio.com/linux.sh" | sudo sh
 ```
 
 Windows 10:
 
 ```powershell
-iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/casalinovalerio/os-setup/raw/master/windows.ps1'))
+iex ((New-Object System.Net.WebClient).DownloadString('https://strap.casalinovalerio.com/windows.ps1'))
 ```
