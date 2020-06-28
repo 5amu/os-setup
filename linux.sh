@@ -96,21 +96,24 @@ retrieve_ssh_keys() {
   rm -rf "$_tempdir"
 }
 
-git_myhome() {
-  git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" $@
-}
-  
 myhome_setup() {
   retrieve_ssh_keys || return 1
   _myhome_ssh="github.com:casalinovalerio/.myhome"
   _myhome_usr="/home/$SUDO_USER"
   _myhome_pwd="$_myhome_usr/.myhome"
-  sudo -u "$SUDO_USER" git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
+  sudo -u "$SUDO_USER" \
+    git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
   chown "$SUDO_USER":"$SUDO_USER" -R "$_myhome_pwd"
   rm "${_myhome_usr}/.profile"
-  sudo -u "$SUDO_USER" git_myhome checkout -f master
-  sudo -u "$SUDO_USER" git_myhome submodule init
-  sudo -u "$SUDO_USER" git_myhome submodule update
+  sudo -u "$SUDO_USER" \
+    git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
+    checkout -f master
+  sudo -u "$SUDO_USER" \
+    git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
+    submodule init
+  sudo -u "$SUDO_USER" \
+    git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
+    submodule update
 }
 
 want_blackarch() {
