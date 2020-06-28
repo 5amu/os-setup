@@ -108,7 +108,7 @@ myhome_setup() {
   sudo -u "$SUDO_USER" git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
   chown "$SUDO_USER":"$SUDO_USER" -R "$_myhome_pwd"
   rm "${_myhome_usr}/.profile"
-  git_myhome checkout master
+  git_myhome checkout -f master
   git_myhome submodule init
   git_myhome submodule update
 }
