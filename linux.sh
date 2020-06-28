@@ -106,7 +106,9 @@ myhome_setup() {
   sudo -u "$SUDO_USER" \
     git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
     checkout -f master
-  sleep 5
+  sudo -u "$SUDO_USER" \
+    git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
+    worktree add "$_myhome_pwd" master
   sudo -u "$SUDO_USER" \
     git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" \
     submodule init
