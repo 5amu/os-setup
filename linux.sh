@@ -114,7 +114,7 @@ myhome_setup() {
 }
 
 want_blackarch() {
-  printf "[n/Y]" && read -r _choice
+  printf "[n/Y]: " && read -r _choice < /dev/tty && printf "\n"
   [ "$_choice" != "y" ] && [ "$_choice" != "Y" ] && return 0
   wget "https://blackarch.org/strap.sh" -O "/tmp/blackarch"
 }
@@ -131,7 +131,7 @@ aur_helper() {
   git clone "https://aur.archlinux.org/yay" /opt/yay
   chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
   cd /opt/yay
-  sudo -u "$SUDO_USER" makepkg -si
+  sudo -u "$SUDO_USER" makepkg -si --noconfirm
 }
 
 ### Actual script
