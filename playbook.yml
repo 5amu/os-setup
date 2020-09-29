@@ -1,0 +1,51 @@
+- hosts: localhost
+  vars:
+      - main_user: "<user>"
+      - pkg_manager: "<pkgman>"
+  tasks:
+      - name: "Updating and upgrading with apt"
+        become: yes
+        apt:
+            name: "*"
+            state: latest
+            upgrade: dist
+            update_cache: yes
+            cache_valid_time: 3600
+            autoclean: yes
+            autoremove: yes
+        when: pkg_manager == "apt"
+      - name: "Updating and upgrading with pacman"
+        become: yes
+        community.general.pacman:
+            update_cache: yes
+            upgrade: yes
+        when: pkg_manager == "pac"
+      - name: "Install packages"
+        become: yes
+        any_errors_fatal: no
+        package:
+            name:
+                - alacritty
+                - firefox
+                - virtualbox
+                - zathura
+                - zathura-pdf-poppler
+                - fakeroot
+                - neovim
+                - curl
+                - git
+                - wget
+                - zsh
+                - cmake
+                - r
+                - xclip
+                - tmux
+      - name: "Setting up .myhome"
+        git:
+            repo: git@github.com:casalinovalerio/.myhome.git
+            dest: "/home/{{ main_user }}/.myhome"
+            bare: yes
+            key_file: "/home/{{ main_user }}/.ssh/casalinovalerio"
+            force: yes
+            track_submodules: yes
+

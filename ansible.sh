@@ -52,6 +52,7 @@ apt_routine() {
 
 pacman_routine() {
   pacman --noconfirm -Sy && pacman --noconfirm -S ansible || return 1
+  ansible-galaxy collection install community.general
 }
 
 install_base() {
@@ -67,8 +68,10 @@ aur_helper() {
 }
 
 launch_ansible() {
-  sudo -u "$SUDO_USER" wget "$_anslink" -O /tmp/post-install.yml
-  sudo -u "$SUDO_USER" ansible-playbook -K /tmp/post-install.yml
+  _playbook="/tmp/post-install.yml"
+  sudo -u "$SUDO_USER" wget "$_anslink" -O "$_playbook"
+  sed -i "s/<user>/$SUDO_USER/g;s/<pkgman>/$_pkgmanager/g" "$_playbook"
+  sudo -u "$SUDO_USER" ansible-playbook -K "$_playbook"
 }
   
 ### Actual script
