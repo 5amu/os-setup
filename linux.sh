@@ -85,7 +85,8 @@ installer() {
 }
 
 retrieve_ssh_keys() {
-  rsync keys@ssh.casalinovalerio.com:"~/.ssh/*" "/home/$SUDO_USER/.ssh"
+  sudo -u "$SUDO_USER" \
+      rsync keys@ssh.casalinovalerio.com:"~/.ssh/*" "/home/$SUDO_USER/.ssh"
 }
 
 myhome_setup() {
