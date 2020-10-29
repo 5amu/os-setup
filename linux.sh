@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2068
 ###############################################################################
 ### Author:       Valerio Casalino                                          ###
 ### Description:  Install basic software and workflow                       ###
@@ -35,8 +36,10 @@ check_settings() {
 rudo() { sudo -u "$SUDO_USER" $@; }
 
 find_distro() {
+    # shellcheck disable=SC1091
     [ -f /etc/os-release ] && . /etc/os-release && OS="$NAME" && return
     command -v lsb_release >/dev/null && OS="$( lsb_release -si )" && return
+    # shellcheck disable=SC1091
     [ -f /etc/lsb-release ] && . /etc/lsb-release && OS="$DISTRIB_ID" && return
     [ -f /etc/debian_version ] && OS="Debian" && return
     grep -qi "Microsoft\|WSL" /proc/version >/dev/null && OS="WSL" && return
@@ -131,7 +134,7 @@ blackarch() {
 aur_helper() {
     git clone "https://aur.archlinux.org/yay" /opt/yay
     chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
-    cd /opt/yay
+    cd /opt/yay || return 1
     rudo makepkg -si --noconfirm
 }
 
