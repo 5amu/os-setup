@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 ###############################################################################
 ### Author:       Valerio Casalino                                          ###
 ### Description:  Install basic software and workflow                       ###
@@ -32,6 +32,9 @@ check_settings() {
   [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not logged as root" && return 1
   return 0
 }
+
+# Regular User DO
+rudo() { sudo -u "$SUDO_USER" $@; }
 
 find_distro() {
   [ -f /etc/os-release ] && . /etc/os-release && OS="$NAME" && return 0
@@ -85,8 +88,7 @@ installer() {
 }
 
 retrieve_ssh_keys() {
-  sudo -u "$SUDO_USER" \
-      rsync keys@ssh.casalinovalerio.com:"~/.ssh/*" "/home/$SUDO_USER/.ssh"
+  rudo rsync keys@ssh.casalinovalerio.com:"~/.ssh/*" "/home/$SUDO_USER/.ssh"
 }
 
 myhome_setup() {
@@ -94,14 +96,10 @@ myhome_setup() {
   _myhome_ssh="github.com:casalinovalerio/.myhome"
   _myhome_usr="/home/$SUDO_USER"
   _myhome_pwd="$_myhome_usr/.myhome"
-  sudo -u "$SUDO_USER" \
-    git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
-  sudo -u "$SUDO_USER" \
-    git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" \
-    checkout -f master
+  rudo git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
+  rudo git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" checkout -f master
   cd "$_myhome_usr"
-  sudo -u "$SUDO_USER" \
-    git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" \
+  rudo git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" \
     submodule update --init --recursive
   chsh "$SUDO_USER" -s /bin/zsh
 }
@@ -124,7 +122,7 @@ aur_helper() {
   git clone "https://aur.archlinux.org/yay" /opt/yay
   chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
   cd /opt/yay
-  sudo -u "$SUDO_USER" makepkg -si --noconfirm
+  rudo makepkg -si --noconfirm
 }
 
 ### Actual script
