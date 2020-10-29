@@ -2,8 +2,6 @@
 ###############################################################################
 ### Author:       Valerio Casalino                                          ###
 ### Description:  Install basic software and workflow                       ###
-### TODO:         - Add installers for apckages not in repos                ###
-###               - Do more testing                                         ###
 ###############################################################################
 
 ### Output messages
@@ -14,45 +12,45 @@ insmsg() { printf "\e[32m==>\e[0m %s\\n" "$1"; }
 ### Global variables
 ####################
 _popos="alacritty chromium chromium-ublock-origin code curl docker.io firefox \
-  gcc gnome-mpv gnome-tweak-tool spotify-client steam-installer virtualbox \
-  telegram-desktop wget zathura zathura-cb zathura-djvu zathura-ps zsh"
+    gcc gnome-mpv gnome-tweak-tool spotify-client steam-installer virtualbox \
+    telegram-desktop wget zathura zathura-cb zathura-djvu zathura-ps zsh"
 _ubuntu="apt-transport-https chromium-browser cmake curl docker.io g++ gcc git \
-  make mpv neovim zsh"
+    make mpv neovim zsh"
 _wsl="cmake curl g++ git gnupg imagemagick neovim pandoc tmux wkhtmltopdf zsh"
 _arch="alacritty android-tools android-udev cmake docker firefox gcc gimp jq \
-  make neovim r sxiv tmux tor torsocks unzip virtualbox xclip zathura zip \
-  zathura-pdf-poppler fakeroot"
+    make neovim r sxiv tmux tor torsocks unzip virtualbox xclip zathura zip \
+    zathura-pdf-poppler fakeroot"
 _blackarch="burpsuite chankro crackmapexec ffuf gobuster hashid joomlascan \
-  msfdb wfuzz wordlistctl"
+    msfdb wfuzz wordlistctl"
 
 ### Functions 
 #############
 check_settings() {
-  [ "$USER" != "root" ] && errmsg "Please, run with sudo" && return 1
-  [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not logged as root" && return 1
-  return 0
+    [ "$USER" != "root" ] && errmsg "Please, run with sudo" && return 1
+    [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not as root" && return 1
+    return 0
 }
 
 # Regular User DO
 rudo() { sudo -u "$SUDO_USER" $@; }
 
 find_distro() {
-  [ -f /etc/os-release ] && . /etc/os-release && OS="$NAME" && return 0
-  command -v lsb_release >/dev/null && OS="$( lsb_release -si )" && return 0
-  [ -f /etc/lsb-release ] && . /etc/lsb-release && OS="$DISTRIB_ID" && return 0
-  [ -f /etc/debian_version ] && OS="Debian" && return 0
-  grep -qi "Microsoft\|WSL" /proc/version >/dev/null && OS="WSL" && return 0
-  errmsg "Can't determine your distro" && return 1
+    [ -f /etc/os-release ] && . /etc/os-release && OS="$NAME" && return
+    command -v lsb_release >/dev/null && OS="$( lsb_release -si )" && return
+    [ -f /etc/lsb-release ] && . /etc/lsb-release && OS="$DISTRIB_ID" && return
+    [ -f /etc/debian_version ] && OS="Debian" && return
+    grep -qi "Microsoft\|WSL" /proc/version >/dev/null && OS="WSL" && return
+    errmsg "Can't determine your distro" && return 1
 }
 
 assign_pkglist() {
-  case "$( printf "%s" "$OS" | sed "s/ //g" )" in
-    Ubuntu)              _pkglink="$_ubuntu" && _pkgmanager="apt"    ;;
-    Pop)                 _pkglink="$_popos"  && _pkgmanager="apt"    ;;
-    WSL)                 _pkglink="$_wsl"    && _pkgmanager="apt"    ;;
-    Arch|ManjaroLinux)   _pkglink="$_arch"   && _pkgmanager="pacman" ;;
-    *)                   errmsg "Unsupported distro" && return 1     ;;
-  esac
+    case "$( printf "%s" "$OS" | sed "s/ //g" )" in
+        Ubuntu)              _pkglink="$_ubuntu" && _pkgmanager="apt"    ;;
+        Pop)                 _pkglink="$_popos"  && _pkgmanager="apt"    ;;
+        WSL)                 _pkglink="$_wsl"    && _pkgmanager="apt"    ;;
+        Arch|ManjaroLinux)   _pkglink="$_arch"   && _pkgmanager="pacman" ;;
+        *)                   errmsg "Unsupported distro" && return 1     ;;
+    esac
 }
   
 update() {
@@ -108,34 +106,33 @@ myhome() {
 }
 
 myhome_setup() {
-  _myhome_ssh="github.com:casalinovalerio/.myhome"
-  _myhome_usr="/home/$SUDO_USER"
-  _myhome_pwd="$_myhome_usr/.myhome"
-  rudo git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
-  rudo myhome checkout -f master
-  rudo myhome submodule update --init --recursive
-  chsh "$SUDO_USER" -s /bin/zsh
+    _myhome_ssh="github.com:casalinovalerio/.myhome"
+    _myhome_usr="/home/$SUDO_USER"
+    _myhome_pwd="$_myhome_usr/.myhome"
+    rudo git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
+    rudo myhome checkout -f master
+    rudo myhome submodule update --init --recursive
+    chsh "$SUDO_USER" -s /bin/zsh
 }
 
 want_blackarch() {
-  printf "[n/Y]: " && read -r _choice < /dev/tty && printf "\n"
-  [ "$_choice" != "y" ] && [ "$_choice" != "Y" ] && return 0
-  wget "https://blackarch.org/strap.sh" -O "/tmp/blackarch"
+    printf "[n/Y]: " && read -r _choice < /dev/tty && printf "\n"
+    [ "$_choice" != "y" ] && [ "$_choice" != "Y" ] && return 0
+    wget "https://blackarch.org/strap.sh" -O "/tmp/blackarch"
 }
 
 blackarch() {
-  [ ! -f "/tmp/blackarch" ] && return 0
-  chmod +x /tmp/blackarch
-  /tmp/blackarch \
-    && installer "$_blackarch" \
-    || { errmsg "Error in installation" && return 1; }
+    [ ! -f "/tmp/blackarch" ] && return 0
+    chmod +x /tmp/blackarch
+    /tmp/blackarch || { errmsg "Error in strap.sh" && return 1; }
+    installer "$_blackarch" || { errmsg "Error in installation" && return 1; }
 }
 
 aur_helper() {
-  git clone "https://aur.archlinux.org/yay" /opt/yay
-  chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
-  cd /opt/yay
-  rudo makepkg -si --noconfirm
+    git clone "https://aur.archlinux.org/yay" /opt/yay
+    chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
+    cd /opt/yay
+    rudo makepkg -si --noconfirm
 }
 
 ### Actual script
