@@ -107,16 +107,17 @@ retrieve_ssh_keys() {
   rudo rsync keys@ssh.casalinovalerio.com:"~/.ssh/*" "/home/$SUDO_USER/.ssh"
 }
 
+myhome() { 
+    git --work-tree="/home/$SUDO_USER" --git-dir="/home/$SUDO_USER/.myhome" $@
+}
 myhome_setup() {
   retrieve_ssh_keys || return 1
   _myhome_ssh="github.com:casalinovalerio/.myhome"
   _myhome_usr="/home/$SUDO_USER"
   _myhome_pwd="$_myhome_usr/.myhome"
   rudo git clone --bare --recurse-submodules "$_myhome_ssh" "$_myhome_pwd"
-  rudo git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" checkout -f master
-  cd "$_myhome_usr"
-  rudo git --work-tree="$_myhome_usr" --git-dir="$_myhome_pwd" \
-    submodule update --init --recursive
+  rudo myhome checkout -f master
+  rudo myhome submodule update --init --recursive
   chsh "$SUDO_USER" -s /bin/zsh
 }
 
