@@ -10,49 +10,33 @@
 errmsg() { printf "\e[31m==>\e[0m %s\\n" "$1"; }
 insmsg() { printf "\e[32m==>\e[0m %s\\n" "$1"; }
 
-### Global variables
-####################
-_popos="alacritty chromium chromium-ublock-origin code curl docker.io firefox \
-    gcc gnome-mpv gnome-tweak-tool spotify-client steam-installer virtualbox \
-    telegram-desktop wget zathura zathura-cb zathura-djvu zathura-ps zsh"
-_ubuntu="apt-transport-https chromium-browser cmake curl docker.io g++ gcc git \
-    make mpv neovim zsh"
-_wsl="cmake curl g++ git gnupg imagemagick neovim pandoc tmux wkhtmltopdf zsh"
-_arch="alacritty android-tools android-udev cmake docker firefox gcc gimp jq \
-    make neovim r sxiv tmux tor torsocks unzip virtualbox xclip zathura zip \
-    zathura-pdf-poppler fakeroot"
-_blackarch="burpsuite chankro crackmapexec ffuf gobuster hashid joomlascan \
-    msfdb wfuzz wordlistctl"
-
 ### Functions 
 #############
 check_settings() {
     [ "$USER" != "root" ] && errmsg "Please, run with sudo" && return 1
     [ -z "$SUDO_USER" ] && errmsg "Run with sudo, not as root" && return 1
-    return 0
 }
 
 # Regular User DO
 rudo() { sudo -u "$SUDO_USER" $@; }
 
-find_distro() {
-    # shellcheck disable=SC1091
-    [ -f /etc/os-release ] && . /etc/os-release && OS="$NAME" && return
-    command -v lsb_release >/dev/null && OS="$( lsb_release -si )" && return
-    # shellcheck disable=SC1091
-    [ -f /etc/lsb-release ] && . /etc/lsb-release && OS="$DISTRIB_ID" && return
-    [ -f /etc/debian_version ] && OS="Debian" && return
-    grep -qi "Microsoft\|WSL" /proc/version >/dev/null && OS="WSL" && return
-    errmsg "Can't determine your distro" && return 1
-}
-
 assign_pkglist() {
-    case "$( printf "%s" "$OS" | sed "s/ //g" )" in
-        Ubuntu)              _pkglink="$_ubuntu" && _pkgmanager="apt"    ;;
-        Pop)                 _pkglink="$_popos"  && _pkgmanager="apt"    ;;
-        WSL)                 _pkglink="$_wsl"    && _pkgmanager="apt"    ;;
-        Arch|ManjaroLinux)   _pkglink="$_arch"   && _pkgmanager="pacman" ;;
-        *)                   errmsg "Unsupported distro" && return 1     ;;
+    command -v apt >/dev/null    && _pkgmanager="apt"
+    command -v pacman >/dev/null && _pkgmanager="pacman"
+    
+    case "$_pkgmanager" in
+        "apt")
+            grep -h -P -o "^Package: \K.*" \
+                /var/lib/apt/lists/ppa.launchpad.net_*_Packages \
+                | sort -u | fzf -m --layout reverse | tr '\n' ' '
+            ;;
+        "pacman")
+            pacman -Slq core extra community multilib \
+                | fzf -m --layout reverse | tr '\n' ' '
+            ;;
+        *)
+            return 1
+            ;;
     esac
 }
   
@@ -86,6 +70,13 @@ clean() {
 }
 cleaner() { clean 2>/dev/null || { errmsg "Couldn't clean" && return 1; }; }
 
+aur_helper() {
+    git clone "https://aur.archlinux.org/yay" /opt/yay
+    chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
+    cd /opt/yay || return 1
+    rudo makepkg -si --noconfirm
+}
+
 install() {
     case "$_pkgmanager" in
         "apt")
@@ -102,6 +93,11 @@ install() {
 
 installer() {
     install "$_pkglink" || { errmsg "Error in installation" && return 1; } 
+    if [ "$_pkgmanager" = "pacman" ]; then
+        aur_helper || { errmsg "Error installing yay" && return 1; }
+        insmsg "Want blackarch?"
+        blackarch || { errmsg "Error installing blackarch" && return 1; }
+    fi
 }
 
 myhome() { 
@@ -118,37 +114,21 @@ myhome_setup() {
     chsh "$SUDO_USER" -s /bin/zsh
 }
 
-want_blackarch() {
+blackarch() {
     printf "[n/Y]: " && read -r _choice < /dev/tty && printf "\n"
     [ "$_choice" != "y" ] && [ "$_choice" != "Y" ] && return 0
-    wget "https://blackarch.org/strap.sh" -O "/tmp/blackarch"
-}
-
-blackarch() {
-    [ ! -f "/tmp/blackarch" ] && return 0
-    chmod +x /tmp/blackarch
-    /tmp/blackarch || { errmsg "Error in strap.sh" && return 1; }
-    installer "$_blackarch" || { errmsg "Error in installation" && return 1; }
-}
-
-aur_helper() {
-    git clone "https://aur.archlinux.org/yay" /opt/yay
-    chown "$SUDO_USER":"$SUDO_USER" -R /opt/yay
-    cd /opt/yay || return 1
-    rudo makepkg -si --noconfirm
+    curl -sSLf "https://blackarch.org/strap.sh" | sh || return 1
 }
 
 ### Actual script
 #################
 insmsg "Welcome to this installation!" 
 
-check_settings && find_distro && assign_pkglist || exit 1
-[ "$_pkgmanager" = "pacman" ] && insmsg "Install Blackarch?" && want_blackarch
+insmsg "Checking settings [check_settings()]" && check_settings || exit 1
+insmsg "Assigning packages [assign_pkglist()]" && assign_pkglist || exit 1
 insmsg "Updating [updater()]" && updater || exit 1
 insmsg "Installing [installer()]" && installer || exit 1
-[ "$_pkgmanager" = "pacman" ] && aur_helper 
-insmsg "Setup home [myhome_setup()]" && myhome_setup
-[ "$_pkgmanager" = "pacman" ] && insmsg "Blackarch? Install pkgs" && blackarch
-insmsg "Cleaning [cleaner()]" && cleaner
+insmsg "Setup home [myhome_setup()]" && myhome_setup || exit 1
+insmsg "Cleaning [cleaner()]" && cleaner || exit 1
 
 insmsg "It is done!!"
